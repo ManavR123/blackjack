@@ -7,6 +7,7 @@ This is a terminal based blackjack game, built-in python. It currently supports 
 Simply download the repository and run the python file.
 
 From terminal:
+
 `git clone https://github.com/ManavR123/blackjack.git` 
 
 `cd blackjack`
