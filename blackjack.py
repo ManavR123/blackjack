@@ -1,91 +1,101 @@
 import random
-import sqlite3
 
-points = {'A': 1, 'J': 10, 'Q': 10, 'K':10}
-points.update({n: n for n in range(2, 11)})
-
-def hand_score(hand):
-    """Total score for a hand."""
-    total = sum([points[card] for card in hand])
-    if total <= 11 and 'A' in hand:
-        return total + 10
-    return total
-
-db = sqlite3.Connection('cards.db')
-sql = db.execute
-sql('DROP TABLE IF EXISTS cards')
-sql('CREATE TABLE cards(card, place);')
-
-def play(card, place):
+def play(card, who):
     """Play a card so that the player can see it."""
-    sql('INSERT INTO cards VALUES (?, ?)', (card, place))
-    db.commit()
+    playerHand = players.get(who)
+    # If current player hasn't gotten a card yet, create a new hand for them
+    if playerHand == None:
+        playerHand = [card]
+        playerScore[who] = points[card]
+        players[who] = playerHand
+    else:
+        playerScore[who] = playerScore[who] + points[card]
+        playerHand.append(card)
+    # Keep track of players who have Aces
+    if card == 'A':
+        playerHasAce[who] = True
 
 def score(who):
     """Compute the hand score for the player or dealer."""
-    cards = sql('SELECT * from cards where place = ?;', [who])
-    return hand_score([card for card, place in cards.fetchall()])
+    score = playerScore[who]
+    # Increment score if player has an Ace
+    if score <= 11 and playerHasAce.get(who):
+        score += 10
+    return score
 
 def bust(who):
     """Check if the player or dealer went bust."""
     return score(who) > 21
 
-player, dealer = "Player", "Dealer"
-
 def play_hand(deck):
     """Play a hand of Blackjack."""
-    play(deck.pop(), player)
-    play(deck.pop(), dealer)
-    play(deck.pop(), player)
+    play(deck.pop(), DEALER)
+    play(deck.pop(), PLAYER)
+    # We will hide 2nd card for dealer for now
     hidden = deck.pop()
+    play(deck.pop(), PLAYER)
     print("Dealer's Cards")
-    dealer_cards = sql('SELECT card FROM cards WHERE place = "Dealer";').fetchall()
-    print([card[0] for card in dealer_cards])
+    print([card for card in players[DEALER]])
     print("Player's Cards")
-    player_cards = sql('SELECT card FROM cards WHERE place = "Player";').fetchall()
-    print([card[0] for card in player_cards])
+    print([card for card in players[PLAYER]])
     while 'y' in input("Hit? ").lower():
-        play(deck.pop(), player)
-        player_cards = sql('SELECT card FROM cards WHERE place = "Player";').fetchall()
-        print([card[0] for card in player_cards])
-        if bust(player):
-            print(player, "went bust!")
+        play(deck.pop(), PLAYER)
+        print([card for card in players[PLAYER]])
+        if bust(PLAYER):
+            print("Player went bust!")
             print("Dealer wins")
             return
-    print("Back to dealer's turn")
-    play(hidden, dealer)
-    print("Dealer's Cards")
-    dealer_cards = sql('SELECT card FROM cards WHERE place = "Dealer";').fetchall()
-    print([card[0] for card in dealer_cards])
 
-    while score(dealer) < 17:      
-        play(deck.pop(), dealer)
-        dealer_cards = sql('SELECT card FROM cards WHERE place = "Dealer";').fetchall()
-        print([card[0] for card in dealer_cards]) 
-        if bust(dealer):
-            print(dealer, "went bust!")
+    print("Back to dealer's turn")
+    play(hidden, DEALER)
+    print("Dealer's Cards")
+    print([card for card in players[DEALER]])
+
+    # Dealer must have at least 17
+    while score(DEALER) < 17:
+        play(deck.pop(), DEALER)
+        print([card for card in players[DEALER]])
+        if bust(DEALER):
+            print("Dealer went bust!")
             print("Player wins")
             return
 
-    print(player, score(player), "and", dealer, score(dealer))
-    if score(player) < score(dealer):
+    print("Player scored", score(PLAYER), "and Dealer scored", score(DEALER))
+    if score(PLAYER) < score(DEALER):
         print("Dealer wins")
-    elif score(player) > score(dealer):
+    elif score(PLAYER) > score(DEALER):
         print("Player wins")
     else:
         print("Tie")
 
-playing = True
-deck = list(points.keys()) * 4
+# Set point values for all cards
+points = {'A': 1, 'J': 10, 'Q': 10, 'K':10}
+points.update({n: n for n in range(2, 11)})
+
+# Create playing deck with 6 actual decks
+deck = list(points.keys()) * 6
+# Shuffle deck
 random.shuffle(deck)
+
+# Denote keys that correspond to dealer and player
+DEALER = 0
+PLAYER = 1
+
+# Begin play cycle
+playing = True
 while playing:
-    print('\nDealing...')
+    # Create dictionaries to store all hands
+    players = {}
+    playerScore = {}
+    playerHasAce = {}
+
+    print("\nDealing...")
     play_hand(deck)
-    sql('UPDATE cards SET place="Discard";')
     if 'n' in input("Keep playing? ").lower():
         playing = False
+
+    # If deck becomes small reshuffle so we don't run out of cars
     if len(deck) < 10:
         print("Reshuffling")
-        deck = list(points.keys()) * 4
+        deck = list(points.keys()) * 6
         random.shuffle(deck)
-        sql("DELETE FROM cards;")
