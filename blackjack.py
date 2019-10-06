@@ -1,7 +1,7 @@
 import random
 
 def play_card(card, who):
-    """Play a card so that the player can see it."""
+    """Play a card for the given player."""
     playerHand = players.get(who)
     # If current player hasn't gotten a card yet, create a new hand for them
     if playerHand == None:
@@ -16,7 +16,7 @@ def play_card(card, who):
         playerHasAce[who] = True
 
 def score(who):
-    """Compute the hand score for the player or dealer."""
+    """Compute the hand score for the given player."""
     score = playerScore[who]
     # Increment score if player has an Ace
     if score <= 11 and playerHasAce.get(who):
@@ -24,7 +24,7 @@ def score(who):
     return score
 
 def bust(who):
-    """Check if the player or dealer went bust."""
+    """Check if the given player went bust."""
     return score(who) > 21
 
 def play(deck):
@@ -34,10 +34,14 @@ def play(deck):
     # We will hide 2nd card for dealer for now
     hidden = deck.pop()
     play_card(deck.pop(), PLAYER)
+
+    # Show cards
     print("Dealer's Cards")
     print([card for card in players[DEALER]])
     print("Player's Cards")
     print([card for card in players[PLAYER]])
+
+    # Ask player if they want more cards
     while 'y' in input("Hit? (y/n) ").lower():
         play_card(deck.pop(), PLAYER)
         print([card for card in players[PLAYER]])
@@ -60,6 +64,7 @@ def play(deck):
             print("Player wins")
             return
 
+    # See who won!
     print("Player scored", score(PLAYER), "and Dealer scored", score(DEALER))
     if score(PLAYER) < score(DEALER):
         print("Dealer wins")
