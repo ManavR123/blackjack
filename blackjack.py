@@ -1,6 +1,6 @@
 import random
 
-def play(card, who):
+def play_card(card, who):
     """Play a card so that the player can see it."""
     playerHand = players.get(who)
     # If current player hasn't gotten a card yet, create a new hand for them
@@ -27,19 +27,19 @@ def bust(who):
     """Check if the player or dealer went bust."""
     return score(who) > 21
 
-def play_hand(deck):
+def play(deck):
     """Play a hand of Blackjack."""
-    play(deck.pop(), DEALER)
-    play(deck.pop(), PLAYER)
+    play_card(deck.pop(), DEALER)
+    play_card(deck.pop(), PLAYER)
     # We will hide 2nd card for dealer for now
     hidden = deck.pop()
-    play(deck.pop(), PLAYER)
+    play_card(deck.pop(), PLAYER)
     print("Dealer's Cards")
     print([card for card in players[DEALER]])
     print("Player's Cards")
     print([card for card in players[PLAYER]])
     while 'y' in input("Hit? (y/n) ").lower():
-        play(deck.pop(), PLAYER)
+        play_card(deck.pop(), PLAYER)
         print([card for card in players[PLAYER]])
         if bust(PLAYER):
             print("Player went bust!")
@@ -47,13 +47,13 @@ def play_hand(deck):
             return
 
     print("Back to dealer's turn")
-    play(hidden, DEALER)
+    play_card(hidden, DEALER)
     print("Dealer's Cards")
     print([card for card in players[DEALER]])
 
     # Dealer must have at least 17
     while score(DEALER) < 17:
-        play(deck.pop(), DEALER)
+        play_card(deck.pop(), DEALER)
         print([card for card in players[DEALER]])
         if bust(DEALER):
             print("Dealer went bust!")
@@ -90,7 +90,7 @@ while playing:
     playerHasAce = {}
 
     print("\nDealing...")
-    play_hand(deck)
+    play(deck)
     if 'n' in input("Keep playing? (y/n) ").lower():
         playing = False
 
