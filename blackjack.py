@@ -38,7 +38,7 @@ def play_hand(deck):
     print([card for card in players[DEALER]])
     print("Player's Cards")
     print([card for card in players[PLAYER]])
-    while 'y' in input("Hit? ").lower():
+    while 'y' in input("Hit? (y/n) ").lower():
         play(deck.pop(), PLAYER)
         print([card for card in players[PLAYER]])
         if bust(PLAYER):
@@ -91,7 +91,7 @@ while playing:
 
     print("\nDealing...")
     play_hand(deck)
-    if 'n' in input("Keep playing? ").lower():
+    if 'n' in input("Keep playing? (y/n) ").lower():
         playing = False
 
     # If deck becomes small reshuffle so we don't run out of cars
