@@ -1,10 +1,10 @@
 # Blackjack Design Document
 
 ### What is this?
-This is a terminal based blackjack game, built-in python. It currently supports only single player with an automated dealer.
+This is a terminal based blackjack game, built-in Python. It currently supports only single player with an automated dealer.
 
 ### To play
-Simply download the repository and run the python file.
+Simply download the repository and run the Python file.
 
 From terminal:
 
@@ -25,4 +25,7 @@ The `playerScore` dictionary allowed me to easily to keeping a running tally on 
 
 The `playerHasAce` dictionary allowed me to avoid a linear pass over the player's hand every time I needed to evaluate their score.
 
-The `players` dictionary stored the hands for the player and the dealer. The reason I opted in for this instead of simply having two arrays, one for the dealer and one for the player, is two-fold. One, it allowed my code to be more concise since I didn't have to do explicit checks on who's hand I needed to update. Second, in the event I want to add support for more players, this infrastructure is well-catered to do so. I would simply just need to cycle through the number of players in the `play` function. The dictionary I currently have works to effectively store all players hands for any given number of players. However, until I implement this added functionality, I made use of the infrastructure by having variable denoting keys for just the Dealer and the Player.
+The `players` dictionary stored the hands for the player and the dealer. The reason I opted in for this instead of simply having two arrays, one for the dealer and one for the player, is two-fold. One, it allowed my code to be more concise since I didn't have to do explicit checks on who's hand I needed to update. Second, in the event I want to add support for more players, this infrastructure is well-catered to do so. I would simply just need to cycle through the number of players in the `play` function. The dictionary I currently have works to effectively store all players hands for any given number of players. However, until I implement this added functionality, I made use of the infrastructure by having variables denoting keys for just the Dealer and the Player.
+
+### Why Python?
+I wanted to keep my code simple and readable and Python was well-suited for this job. I knew coming into development that this program wouldn't be overwhelmingly complex, so I wanted to take advantage of Python's scripting capabilities to make this program lightweight.
